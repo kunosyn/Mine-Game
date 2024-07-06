@@ -1,12 +1,12 @@
-#include "Headers/Terrain.h"
+#include "Headers/Chunk.h"
 #include <algorithm>
 
 
-Terrain::Terrain (void) {
-	m_vertices.setPrimitiveType(sf::Triangles);
-}
+Chunk::Chunk (int x, int y) 
+	: m_vertices(sf::Triangles), m_position(x, y) 
+{ }
 
-void Terrain::push (const TerrainBlock& block) {
+void Chunk::push (const TerrainBlock& block) {
 	sf::Vertex tri[6];
 
 	tri[0].position = block.position;
@@ -32,12 +32,36 @@ void Terrain::push (const TerrainBlock& block) {
 	}
 }
 
-const sf::VertexArray& Terrain::getVertices (void) const {
+void Chunk::clear (void) {
+	m_vertices.clear();
+}
+
+const sf::VertexArray& Chunk::getVertices (void) const {
 	return m_vertices;
 }
 
+const sf::Vector2f& Chunk::getPosition (void) const {
+	return m_position;
+}
+
+bool Chunk::intersects (const sf::FloatRect& bounds) const {
+	return m_vertices.getBounds().intersects(bounds);
+}
+
+bool Chunk::operator == (const Chunk& other) const {
+	return m_position.x == other.m_position.x && m_position.y == other.m_position.y;
+}
+
+size_t Chunk::Hash::operator () (const Chunk& other) const {
+	std::size_t hx = std::hash<float>()(other.m_position.x);
+	std::size_t hy = std::hash<float>()(other.m_position.y);
+
+	return hx ^ (hy << 1);
+}
+
+
 // Private Functions
-sf::Vector2f Terrain::getTextureCoordinates (BlockType type) {
+sf::Vector2f Chunk::getTextureCoordinates (BlockType type) {
 	switch (type) {
 		case BlockType::Stone: return sf::Vector2f(1, 37);
 		case BlockType::Dirt: return sf::Vector2f(1, 19);

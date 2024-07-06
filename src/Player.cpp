@@ -21,7 +21,7 @@ Player::Player (int id)
 	m_character.setFillColor(sf::Color::Cyan);
 	m_character.setPosition(m_position);
 
-	m_view.zoom(4.f);
+	m_view.zoom(.45f);
 }
 
 Player::~Player (void) {
@@ -47,7 +47,6 @@ void Player::draw (sf::RenderWindow* render_window) {
 	m_character.setPosition(Utility::lerp(m_character.getPosition(), m_position, .1));
 	m_view.setCenter(Utility::lerp(m_view.getCenter(), m_position, .1));
 
-	render_window->setView(m_view);
 	render_window->draw(m_character);
 }
 

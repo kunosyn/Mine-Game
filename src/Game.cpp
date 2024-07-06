@@ -46,13 +46,14 @@ void Game::update (void) {
 	m_basePlayer->applyPhysics();
 
 	if (m_basePlayer->isMoving()) {
-		std::cout << "moving" << std::endl;
 		m_terrainGenerator->generateTerrain(m_basePlayer->m_position, m_basePlayer->getViewBounds());
 	}
 }
 
 void Game::render (void) {
 	m_window->clear(sf::Color::Color(143, 224, 242));
+
+	m_window->setView(m_basePlayer->m_view);
 	m_terrainGenerator->renderTerrain();
 
 	m_playerManager->drawPlayers(m_window.get());

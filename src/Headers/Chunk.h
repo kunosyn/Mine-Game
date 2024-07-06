@@ -17,16 +17,26 @@ struct TerrainBlock {
 	sf::Vector2f position;
 };
 
-class Terrain {
+class Chunk {
 public:
-	Terrain(void);
+	Chunk(int x, int y);
 
 	void push(const TerrainBlock& block);
-	void remove(int x, int y);
+	void clear(void);
 
 	const sf::VertexArray& getVertices(void) const;
+	const sf::Vector2f& getPosition(void) const;
 
+	bool intersects(const sf::FloatRect& other) const;
+	bool operator == (const Chunk& other) const;
+	
+	struct Hash {
+		std::size_t operator()(const Chunk& chunk) const;
+	};
 private:
+	std::vector<TerrainBlock> m_blocks;
 	sf::VertexArray m_vertices;
+	sf::Vector2f m_position;
+
 	sf::Vector2f getTextureCoordinates(BlockType type);
 };

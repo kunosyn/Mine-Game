@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Terrain.h"
+#include "Chunk.h"
 #include "FastNoiseLite.h"
 
 #include <SFML/Graphics.hpp>
@@ -23,7 +23,7 @@ public:
 
 private:
 	sf::RenderWindow* m_window;
-	Terrain m_terrain;
+	std::unordered_set<Chunk, Chunk::Hash> m_terrain;
 
 	FastNoiseLite m_noise;
 	uint32_t m_seed;

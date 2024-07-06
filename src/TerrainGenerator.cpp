@@ -35,22 +35,28 @@ void TerrainGenerator::selectSeed (void) {
 }
 
 void TerrainGenerator::generateTerrain (const sf::Vector2f& position, const sf::FloatRect viewBounds) {
-	int posX = static_cast<int>(position.x) - CHUNK_WIDTH;
-	int posY = static_cast<int>(position.y) - CHUNK_HEIGHT;
+	for (auto it = m_terrain.begin(); it != m_terrain.end();) {
+		if (!it->intersects(viewBounds)) {
+   			it = m_terrain.erase(it);
+			std::cout << "# of Chunks: " <<  m_terrain.size() << std::endl;
+		}
+		else {
+			++it;
+		}
+	}
 
-	for (int chunkX = std::clamp(posX, 0, MAP_WIDTH); chunkX < position.x + CHUNK_WIDTH * 2; chunkX += CHUNK_WIDTH) {
-		for (int chunkY = std::clamp(posY, 0, MAP_HEIGHT); chunkY < std::fabs(position.y + CHUNK_HEIGHT * 2); chunkY += CHUNK_HEIGHT) {
+	int posX = std::clamp(static_cast<int>(position.x) - (CHUNK_WIDTH * BLOCK_WIDTH) * 2, 0, MAP_WIDTH * BLOCK_WIDTH);
+	int posY = std::clamp(static_cast<int>(position.y) - (CHUNK_HEIGHT * BLOCK_WIDTH) * 2, 0, MAP_HEIGHT * BLOCK_WIDTH);
 
-			sf::FloatRect chunkBounds(
-				chunkX * BLOCK_WIDTH,
-				chunkY * BLOCK_WIDTH,
-				CHUNK_WIDTH * BLOCK_WIDTH,
-				CHUNK_HEIGHT * BLOCK_WIDTH
-			);
+	for (int chunkX = posX; (chunkX * BLOCK_WIDTH) < position.x + (CHUNK_WIDTH * BLOCK_WIDTH) * 2; chunkX += CHUNK_WIDTH) {
+		for (int chunkY = posY; (chunkY * BLOCK_WIDTH) < position.y + (CHUNK_WIDTH * BLOCK_WIDTH) * 2; chunkY += CHUNK_HEIGHT) {
+			Chunk chunk(chunkX / CHUNK_WIDTH, chunkY / CHUNK_HEIGHT);
 
-			if (!chunkBounds.intersects(viewBounds)) {
+			if (m_terrain.find(chunk) != m_terrain.end()) {
+				std::cout << "# of Chunks" << m_terrain.size() << std::endl;
 				continue;
 			}
+
 
 			for (int x = chunkX; x < (chunkX + CHUNK_WIDTH); ++x) {
 				float noiseValue = m_noise.GetNoise(x * TERRAIN_FREQUENCY, m_seed * TERRAIN_FREQUENCY);
@@ -59,15 +65,20 @@ void TerrainGenerator::generateTerrain (const sf::Vector2f& position, const sf::
 				for (int y = 0; y < height; ++y) {
 					
 					BlockType type = getBlockTypeFromHeight(y, height);
-					m_terrain.push(TerrainBlock { type, sf::Vector2f(x * BLOCK_WIDTH, -y * BLOCK_WIDTH) });
+					chunk.push(TerrainBlock { type, sf::Vector2f(x * BLOCK_WIDTH, -y * BLOCK_WIDTH) });
 				}
 			}
+
+			m_terrain.insert(chunk);
+			std::cout << "# of Chunks: " << m_terrain.size() << std::endl;
 		}
 	}
 }
 
 void TerrainGenerator::renderTerrain (void) const {
-	m_window->draw(m_terrain.getVertices(), &m_textureAtlas);
+	for (const Chunk& chunk : m_terrain) {
+		m_window->draw(chunk.getVertices(), &m_textureAtlas);
+	}
 }
 
 BlockType TerrainGenerator::getBlockTypeFromHeight (int y, int height) {
