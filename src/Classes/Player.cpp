@@ -1,18 +1,20 @@
-#include "Headers/Player.h"
-#include "Headers/Utility.h"
-#include "Headers/Constants.h"
+#include "../Headers/Classes/Player.h"
+#include "../Headers/Utility.h"
+#include "../Headers/Constants.h"
 
 #include <iostream>
 
 
 // Public Functions
-Player::Player (int id)
+Player::Player (int id, const float& delta)
 	: m_maxHealth(100), m_health(100), 
-	m_walkspeed(5.0f),
+	m_walkspeed(100.0f),
 	m_id(id), 
 	m_state(PlayerState::Idle), m_isGrounded(true),
 	m_position(sf::Vector2f(0, 0)),
-	m_view(sf::FloatRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT))
+	m_view(sf::FloatRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT)),
+	m_deltaTime(delta),
+	m_lastRenderPosition(sf::Vector2f(0, 0))
 {
 	std::cout << "[PlayerManager]: Player " << m_id << " created." << std::endl;
 
@@ -21,7 +23,7 @@ Player::Player (int id)
 	m_character.setFillColor(sf::Color::Cyan);
 	m_character.setPosition(m_position);
 
-	m_view.zoom(.45f);
+	m_view.zoom(.7f);
 }
 
 Player::~Player (void) {
@@ -31,16 +33,21 @@ Player::~Player (void) {
 
 void Player::move (PlayerMoveAxis axis, float translateBy) {
 	if (axis == PlayerMoveAxis::X) {
-		m_position.x += translateBy;
+		m_position.x += translateBy * m_deltaTime;
 	} 
 	else if (axis == PlayerMoveAxis::Y) {
-		m_position.y += translateBy;
+		m_position.y += translateBy * m_deltaTime;
 	}
 }
 
-bool Player::isMoving (void) const {
-	sf::Vector2f characterPos = m_character.getPosition();
-	return std::fabs(m_position.x - characterPos.x) > 10 || std::fabs(m_position.y - characterPos.y) > 10;
+bool Player::eligibleForGeneration(void) {
+	if (Utility::getVectorMagnitude(m_position, m_lastRenderPosition) > 50) {
+		m_lastRenderPosition = m_position;
+
+		return true;
+	}
+
+	return false;
 }
 
 void Player::draw (sf::RenderWindow* render_window) {
@@ -56,22 +63,22 @@ int Player::getId (void) const {
 
 void Player::applyPhysics (void) {
 	if (m_acceleration.x > 0 || m_acceleration.y > 0) {
-		m_velocity += m_acceleration;
+		m_velocity += m_acceleration * m_deltaTime;
 	}
 	else {
-		m_acceleration = Utility::lerp(m_acceleration, sf::Vector2f(0, 0), .1f); // Apply wind resistance
+		m_acceleration = Utility::lerp(m_acceleration, sf::Vector2f(0, 0), .1f * m_deltaTime); // Apply wind resistance
 	}
 
 
 	if (m_velocity.x > 0 || m_velocity.y > 0) {
-		m_position += m_velocity;
+		m_position += m_velocity * m_deltaTime;
 	}
 	else {
-		m_velocity = Utility::lerp(m_velocity, sf::Vector2f(0, 0), .1f); // Apply friction
+		m_velocity = Utility::lerp(m_velocity, sf::Vector2f(0, 0), .1f * m_deltaTime); // Apply friction
 	}
 
 	if (m_state != PlayerState::Jumping) {
-		m_acceleration += sf::Vector2f(0, GRAVITY);
+		m_acceleration += sf::Vector2f(0, GRAVITY * m_deltaTime);
 	}
 
 
@@ -90,7 +97,6 @@ sf::FloatRect Player::getViewBounds (void) const {
 
 	return sf::FloatRect(center.x - size.x / 2.f, center.y - size.y / 2.f, size.x, size.y);
 }
-
 
 
 // Private Functions

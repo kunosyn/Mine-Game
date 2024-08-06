@@ -16,6 +16,7 @@ constexpr int GAME_HEIGHT = 600;
 
 constexpr int VIEW_WIDTH = 800;
 constexpr int VIEW_HEIGHT = 600;
+constexpr double VIEW_ZOOM_MULTIPLIER = 0.00032142857;
 
 constexpr int RENDER_LOOKBACK = 30;
 constexpr int RENDER_LOOK = 30;
@@ -33,4 +34,8 @@ constexpr int BLOCK_WIDTH = 20;
 
 constexpr int DIRT_LAYER_HEIGHT = 5;
 constexpr float SURFACE_VALUE = 0.25F;
+#pragma endregion
+
+#pragma region InputConstants
+constexpr int MAX_KEYS_HELD = 10;
 #pragma endregion

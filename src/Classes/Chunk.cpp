@@ -1,14 +1,15 @@
-#include "Headers/Chunk.h"
+#include "../Headers/Classes/Chunk.h"
 #include <algorithm>
 
 
 Chunk::Chunk (int x, int y) 
 	: m_vertices(sf::Triangles), m_position(x, y) 
-{ }
+{ } 
 
 void Chunk::push (const TerrainBlock& block) {
 	sf::Vertex tri[6];
 
+	// Draw two triangles to form a quad
 	tri[0].position = block.position;
 	tri[1].position = block.position + sf::Vector2f(BLOCK_WIDTH, 0);
 	tri[2].position = block.position + sf::Vector2f(BLOCK_WIDTH, BLOCK_WIDTH);
@@ -17,6 +18,8 @@ void Chunk::push (const TerrainBlock& block) {
 	tri[4].position = block.position + sf::Vector2f(BLOCK_WIDTH, BLOCK_WIDTH);
 	tri[5].position = block.position + sf::Vector2f(0, BLOCK_WIDTH);
 
+	
+	// Apply textures to both halves of the quad
 	sf::Vector2f texCoords = getTextureCoordinates(block.type);
 
 	tri[0].texCoords = texCoords;
@@ -27,9 +30,8 @@ void Chunk::push (const TerrainBlock& block) {
 	tri[4].texCoords = texCoords + sf::Vector2f(16, 16);
 	tri[5].texCoords = texCoords + sf::Vector2f(0, 16);
 
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < 6; ++i)
 		m_vertices.append(tri[i]);
-	}
 }
 
 void Chunk::clear (void) {
@@ -42,6 +44,10 @@ const sf::VertexArray& Chunk::getVertices (void) const {
 
 const sf::Vector2f& Chunk::getPosition (void) const {
 	return m_position;
+}
+
+const std::size_t Chunk::getVertexCount (void) const {
+	return getVertices().getVertexCount();
 }
 
 bool Chunk::intersects (const sf::FloatRect& bounds) const {
@@ -63,9 +69,10 @@ size_t Chunk::Hash::operator () (const Chunk& other) const {
 // Private Functions
 sf::Vector2f Chunk::getTextureCoordinates (BlockType type) {
 	switch (type) {
-		case BlockType::Stone: return sf::Vector2f(1, 37);
-		case BlockType::Dirt: return sf::Vector2f(1, 19);
-		case BlockType::Grass: return sf::Vector2f(37, 1);
-		default: return sf::Vector2f(19, 37);
+		case BlockType::Bedrock: return sf::Vector2f(2, 2);
+		case BlockType::Stone: return sf::Vector2f(62, 2);
+		case BlockType::Dirt: return sf::Vector2f(42, 22);
+		case BlockType::Grass: return sf::Vector2f(22, 42);
+		default: return sf::Vector2f(22, 22);
 	}
 }

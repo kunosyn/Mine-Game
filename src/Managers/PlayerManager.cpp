@@ -1,9 +1,10 @@
-#include "Headers/PlayerManager.h"
+#include "../Headers/Managers/PlayerManager.h"
 #include <random>
+#include <optional>
 
-PlayerManager::PlayerManager (void) {
-
-}
+PlayerManager::PlayerManager (const float& delta) 
+	: m_deltaTime(delta) 
+{ }
 
 void PlayerManager::createPlayer (void) {
 	std::random_device randomDevice;
@@ -16,8 +17,7 @@ void PlayerManager::createPlayer (void) {
 }
 
 void PlayerManager::addPlayer (int id) {
-	std::unique_ptr<Player> player = std::make_unique<Player>(id);
-	m_players[id] = std::move(player);
+	m_players.insert({ id, std::make_unique<Player>(id, m_deltaTime) });
 }
 
 void PlayerManager::removePlayer(int id) {

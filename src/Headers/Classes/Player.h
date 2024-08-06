@@ -25,11 +25,11 @@ public:
 
 	sf::View m_view;
 
-	Player(int id);
+	Player(int id, const float& delta);
 	~Player(void);
 
 	void move(PlayerMoveAxis axis, float translateBy);
-	bool isMoving(void) const;
+	bool eligibleForGeneration(void);
 
 	void draw(sf::RenderWindow* renderWindow);
 	void applyPhysics(void);
@@ -42,5 +42,7 @@ private:
 	void checkCollisions (const sf::Vector2f& requestedLocation);
 
 	int m_id;
+	const float& m_deltaTime;
 	sf::RectangleShape m_character;
+	sf::Vector2f m_lastRenderPosition;
 };

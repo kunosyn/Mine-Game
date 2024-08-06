@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Constants.h"
+#include "../Constants.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -8,7 +8,8 @@
 enum class BlockType {
 	Grass,
 	Dirt,
-	Stone
+	Stone,
+	Bedrock
 };
 
 
@@ -26,6 +27,7 @@ public:
 
 	const sf::VertexArray& getVertices(void) const;
 	const sf::Vector2f& getPosition(void) const;
+	const std::size_t getVertexCount(void) const;
 
 	bool intersects(const sf::FloatRect& other) const;
 	bool operator == (const Chunk& other) const;
