@@ -32,6 +32,7 @@ FetchContent_MakeAvailable(ImGui)
 FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
 
 set(IMGUI_SFML_FIND_SFML OFF)
+set(LIBRARY_DIRECTORY, C:/CPPLibraries)
 
 # Fetch ImGui-SFML
 FetchContent_Declare(
@@ -41,10 +42,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ImGui-SFML)
 
-include_directories(D:/Programming/CPPLibraries)
+include_directories(${LIBRARY_DIRECTORY})
 
 # Collect source files
-set(SRC_DIR src)
+set(SRC_DIR Program/Source)
 file(GLOB SOURCES "${SRC_DIR}/*.cpp" "${SRC_DIR}/Classes/*.cpp" "${SRC_DIR}/Managers/*.cpp")
 
 add_executable(MineGame ${SOURCES})
@@ -53,7 +54,8 @@ target_include_directories(MineGame PRIVATE
     ${discordrpc_SOURCE_DIR}/include
     ${SFML_SOURCE_DIR}/include
     ${IMGUI_DIR}
-    D:/Programming/CPPLibraries
+    ${LIBRARY_DIRECTORY}
+    ${PROJECT_SOURCE_DIR}/Program/Headers
 )
 
 target_link_libraries(MineGame PRIVATE 
